@@ -13,6 +13,62 @@
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
+  <property name="styleSheet">
+   <string notr="true">    QPushButton {
+        background-color: transparent;
+        border: 1px solid rgba(255, 255, 255, 100);
+        border-radius: 4px;
+        color: white;
+        padding: 5px;
+    }
+    
+    QPushButton:hover {
+        background-color: rgba(255, 255, 255, 30);
+        border: 1px solid rgba(255, 255, 255, 100);
+    }
+    
+    QPushButton:pressed {
+        background-color: rgba(255, 255, 255, 50);
+        border: 1px solid rgba(255, 255, 255, 100);
+    }
+    
+    QMenuBar {
+        background-color: transparent;
+        color: white;
+    }
+    
+    QMenuBar::item {
+        background-color: transparent;
+    }
+    
+    QMenuBar::item:selected {
+        background-color: rgba(255, 255, 255, 30);
+    }
+    
+    QMenuBar::item:pressed {
+        background-color: rgba(255, 255, 255, 50);
+    }
+    
+    QMenu {
+        background-color: transparent;
+        border: 1px solid rgba(255, 255, 255, 100);
+        color: white;
+    }
+    
+    QMenu::item {
+        background-color: transparent;
+        padding: 5px 20px;
+    }
+    
+    QMenu::item:selected {
+        background-color: rgba(255, 255, 255, 30);
+    }
+    
+    QMenu::item:pressed {
+        background-color: rgba(255, 255, 255, 50);
+    }
+tqr</string>
+  </property>
   <widget class="QWidget" name="centralwidget">
    <widget class="QPushButton" name="b8">
     <property name="geometry">
@@ -24,7 +80,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>8</string>
     </property>
    </widget>
    <widget class="QPushButton" name="b6">
@@ -37,7 +93,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>6</string>
     </property>
    </widget>
    <widget class="QPushButton" name="b7">
@@ -50,7 +106,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>7</string>
     </property>
    </widget>
    <widget class="QPushButton" name="b1">
@@ -63,7 +119,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>1</string>
     </property>
     <property name="default">
      <bool>false</bool>
@@ -82,7 +138,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>4</string>
     </property>
    </widget>
    <widget class="QPushButton" name="b5">
@@ -95,7 +151,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>5</string>
     </property>
    </widget>
    <widget class="QPushButton" name="b11">
@@ -108,7 +164,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>11</string>
     </property>
    </widget>
    <widget class="QPushButton" name="b12">
@@ -121,7 +177,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>12</string>
     </property>
    </widget>
    <widget class="QPushButton" name="b13">
@@ -134,7 +190,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>13</string>
     </property>
    </widget>
    <widget class="QPushButton" name="b9">
@@ -147,7 +203,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>9</string>
     </property>
    </widget>
    <widget class="QPushButton" name="b15">
@@ -160,7 +216,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>15</string>
     </property>
    </widget>
    <widget class="QPushButton" name="b2">
@@ -173,7 +229,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>2</string>
     </property>
    </widget>
    <widget class="QPushButton" name="b10">
@@ -186,7 +242,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>10</string>
     </property>
    </widget>
    <widget class="QPushButton" name="b14">
@@ -199,7 +255,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>14</string>
     </property>
    </widget>
    <widget class="QPushButton" name="b3">
@@ -212,7 +268,7 @@
      </rect>
     </property>
     <property name="text">
-     <string>PushButton</string>
+     <string>3</string>
     </property>
    </widget>
   </widget>
@@ -229,9 +285,15 @@
     <property name="title">
      <string>settings</string>
     </property>
+    <addaction name="actionset_background"/>
    </widget>
    <addaction name="menusettings"/>
   </widget>
+  <action name="actionset_background">
+   <property name="text">
+    <string>set background</string>
+   </property>
+  </action>
  </widget>
  <resources/>
  <connections/>

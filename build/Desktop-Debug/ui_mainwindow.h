@@ -23,6 +23,7 @@ QT_BEGIN_NAMESPACE
 class Ui_MainWindow
 {
 public:
+    QAction *actionset_background;
     QWidget *centralwidget;
     QPushButton *b8;
     QPushButton *b6;
@@ -47,6 +48,63 @@ public:
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName("MainWindow");
         MainWindow->resize(800, 450);
+        MainWindow->setStyleSheet(QString::fromUtf8("    QPushButton {\n"
+"        background-color: transparent;\n"
+"        border: 1px solid rgba(255, 255, 255, 100);\n"
+"        border-radius: 4px;\n"
+"        color: white;\n"
+"        padding: 5px;\n"
+"    }\n"
+"    \n"
+"    QPushButton:hover {\n"
+"        background-color: rgba(255, 255, 255, 30);\n"
+"        border: 1px solid rgba(255, 255, 255, 100);\n"
+"    }\n"
+"    \n"
+"    QPushButton:pressed {\n"
+"        background-color: rgba(255, 255, 255, 50);\n"
+"        border: 1px solid rgba(255, 255, 255, 100);\n"
+"    }\n"
+"    \n"
+"    QMenuBar {\n"
+"        background-color: transparent;\n"
+"        color: white;\n"
+"    }\n"
+"    \n"
+"    QMenuBar::item {\n"
+"        background-color: transparent;\n"
+"    }\n"
+"    \n"
+"    QMenuBar::item:selected {\n"
+"        background-color: rgba(255, 255, 255, 30);\n"
+"    }\n"
+"    \n"
+"    QMenuBar::item:pressed {\n"
+"        background-color: rgba(255, 255, 255, 50);\n"
+"    }\n"
+"    \n"
+"    QMenu {\n"
+"        background-color: transparent;\n"
+"        border:"
+                        " 1px solid rgba(255, 255, 255, 100);\n"
+"        color: white;\n"
+"    }\n"
+"    \n"
+"    QMenu::item {\n"
+"        background-color: transparent;\n"
+"        padding: 5px 20px;\n"
+"    }\n"
+"    \n"
+"    QMenu::item:selected {\n"
+"        background-color: rgba(255, 255, 255, 30);\n"
+"    }\n"
+"    \n"
+"    QMenu::item:pressed {\n"
+"        background-color: rgba(255, 255, 255, 50);\n"
+"    }\n"
+"tqr"));
+        actionset_background = new QAction(MainWindow);
+        actionset_background->setObjectName("actionset_background");
         centralwidget = new QWidget(MainWindow);
         centralwidget->setObjectName("centralwidget");
         b8 = new QPushButton(centralwidget);
@@ -104,6 +162,7 @@ public:
         MainWindow->setMenuBar(menubar);
 
         menubar->addAction(menusettings->menuAction());
+        menusettings->addAction(actionset_background);
 
         retranslateUi(MainWindow);
 
@@ -116,21 +175,22 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
-        b8->setText(QCoreApplication::translate("MainWindow", "PushButton", nullptr));
-        b6->setText(QCoreApplication::translate("MainWindow", "PushButton", nullptr));
-        b7->setText(QCoreApplication::translate("MainWindow", "PushButton", nullptr));
-        b1->setText(QCoreApplication::translate("MainWindow", "PushButton", nullptr));
-        b4->setText(QCoreApplication::translate("MainWindow", "PushButton", nullptr));
-        b5->setText(QCoreApplication::translate("MainWindow", "PushButton", nullptr));
-        b11->setText(QCoreApplication::translate("MainWindow", "PushButton", nullptr));
-        b12->setText(QCoreApplication::translate("MainWindow", "PushButton", nullptr));
-        b13->setText(QCoreApplication::translate("MainWindow", "PushButton", nullptr));
-        b9->setText(QCoreApplication::translate("MainWindow", "PushButton", nullptr));
-        b15->setText(QCoreApplication::translate("MainWindow", "PushButton", nullptr));
-        b2->setText(QCoreApplication::translate("MainWindow", "PushButton", nullptr));
-        b10->setText(QCoreApplication::translate("MainWindow", "PushButton", nullptr));
-        b14->setText(QCoreApplication::translate("MainWindow", "PushButton", nullptr));
-        b3->setText(QCoreApplication::translate("MainWindow", "PushButton", nullptr));
+        actionset_background->setText(QCoreApplication::translate("MainWindow", "set background", nullptr));
+        b8->setText(QCoreApplication::translate("MainWindow", "8", nullptr));
+        b6->setText(QCoreApplication::translate("MainWindow", "6", nullptr));
+        b7->setText(QCoreApplication::translate("MainWindow", "7", nullptr));
+        b1->setText(QCoreApplication::translate("MainWindow", "1", nullptr));
+        b4->setText(QCoreApplication::translate("MainWindow", "4", nullptr));
+        b5->setText(QCoreApplication::translate("MainWindow", "5", nullptr));
+        b11->setText(QCoreApplication::translate("MainWindow", "11", nullptr));
+        b12->setText(QCoreApplication::translate("MainWindow", "12", nullptr));
+        b13->setText(QCoreApplication::translate("MainWindow", "13", nullptr));
+        b9->setText(QCoreApplication::translate("MainWindow", "9", nullptr));
+        b15->setText(QCoreApplication::translate("MainWindow", "15", nullptr));
+        b2->setText(QCoreApplication::translate("MainWindow", "2", nullptr));
+        b10->setText(QCoreApplication::translate("MainWindow", "10", nullptr));
+        b14->setText(QCoreApplication::translate("MainWindow", "14", nullptr));
+        b3->setText(QCoreApplication::translate("MainWindow", "3", nullptr));
         menusettings->setTitle(QCoreApplication::translate("MainWindow", "settings", nullptr));
     } // retranslateUi
 

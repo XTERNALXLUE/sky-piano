@@ -6,6 +6,13 @@
 #include <QFileInfo>
 #include <QAudioOutput>
 #include <QKeyEvent>
+#include <QFileDialog>
+#include <QStyle>
+#include <QPixmap>
+#include <QDir>
+#include <QStandardPaths>
+#include <QPainter>
+#include <QGridLayout>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -39,6 +46,13 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->b13, &QPushButton::clicked, this, [this](){ playSound(13); });
     connect(ui->b14, &QPushButton::clicked, this, [this](){ playSound(14); });
     connect(ui->b15, &QPushButton::clicked, this, [this](){ playSound(15); });
+
+    // 连接设置背景的动作
+    connect(ui->actionset_background, &QAction::triggered, this, &MainWindow::setBackground);
+    
+    // 创建资源目录并加载背景
+    QDir().mkpath("resource/img");
+    loadBackgroundImage();
 }
 
 MainWindow::~MainWindow()
@@ -57,7 +71,6 @@ MainWindow::~MainWindow()
 void MainWindow::playSound(int number)
 {
     QString soundFile = QString(":/sounds/%1.mp3").arg(number);
-    qDebug() << "正在播放文件:" << soundFile;
     QUrl soundUrl = QUrl(QString("qrc%1").arg(soundFile));
     
     QMediaPlayer *availablePlayer = nullptr;
@@ -86,7 +99,6 @@ void MainWindow::playSound(int number)
         });
     }
     
-    qDebug() << "正在播放文件:" << soundFile;
     availablePlayer->setSource(soundUrl);
     availablePlayer->play();
 }
@@ -210,5 +222,58 @@ void MainWindow::keyReleaseEvent(QKeyEvent *event)
         case Qt::Key_B:
             ui->b15->setDown(false);
             break;
+    }
+}
+
+void MainWindow::loadBackgroundImage()
+{
+    QDir imgDir("resource/img");
+    QStringList filters;
+    filters << "background.*";
+    QStringList files = imgDir.entryList(filters, QDir::Files);
+    
+    if (!files.isEmpty()) {
+        QString backgroundPath = "resource/img/" + files.first();
+        backgroundImage.load(backgroundPath);
+    }
+}
+
+void MainWindow::setBackground()
+{
+    QString fileName = QFileDialog::getOpenFileName(this,
+        tr("Select background image"),
+        "",
+        tr("图片文件 (*.png *.jpg *.jpeg *.bmp)"));
+        
+    if (!fileName.isEmpty()) {
+        QFileInfo fileInfo(fileName);
+        QString extension = fileInfo.suffix();
+        
+        // 删除旧的背景图片
+        QDir imgDir("resource/img");
+        QStringList filters;
+        filters << "background.*";
+        QStringList oldFiles = imgDir.entryList(filters, QDir::Files);
+        for (const QString &oldFile : oldFiles) {
+            imgDir.remove(oldFile);
+        }
+        
+        // 复制新图片到资源目录
+        QString newPath = QString("resource/img/background.%1").arg(extension);
+        if (QFile::copy(fileName, newPath)) {
+            backgroundImage.load(newPath);
+            update();  // 触发重绘
+        }
+    }
+}
+
+void MainWindow::paintEvent(QPaintEvent *event)
+{
+    QMainWindow::paintEvent(event);
+    
+    if (!backgroundImage.isNull()) {
+        QPainter painter(this);
+        // 将图片缩放到窗口大小并绘制
+        painter.drawPixmap(0, 0, width(), height(), backgroundImage);
     }
 }
