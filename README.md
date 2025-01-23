@@ -5,6 +5,6 @@ Piano Simulator in Sky: Children of the Light
 ——2025.1.20
 ---
 Added the function of setting background
-![demo](./resources/demo2.png)
+![demo2](./resources/demo2.png)
 ——2025.1.23
 ---
