@@ -6,7 +6,7 @@
 ** WARNING! All changes made in this file will be lost!
 *****************************************************************************/
 
-#include "../../widget.h"
+#include "../../../../../Github/sky-piano/widget.h"
 #include <QtCore/qmetatype.h>
 
 #include <QtCore/qtmochelpers.h>

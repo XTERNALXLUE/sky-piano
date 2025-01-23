@@ -1,5 +1,5 @@
-#include "widget.h"
-#include "ui_widget.h"
+#include "mainwindow.h"
+#include "ui_mainwindow.h"
 #include <QMediaPlayer>
 #include <QtMultimedia/QMediaPlayer>
 #include <QDebug>
@@ -7,14 +7,13 @@
 #include <QAudioOutput>
 #include <QKeyEvent>
 
-Widget::Widget(QWidget *parent)
-    : QWidget(parent)
-    , ui(new Ui::Widget)
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
     this->setFixedSize(800, 450);
     
-    // 预先创建多个播放器和音频输出（比如5个，可以同时播放5个音频）
     for(int i = 0; i < 15; i++) {
         QMediaPlayer *player = new QMediaPlayer(this);
         QAudioOutput *audioOutput = new QAudioOutput(this);
@@ -25,7 +24,6 @@ Widget::Widget(QWidget *parent)
         audioOutputs.append(audioOutput);
     }
 
-    // 连接按钮信号到槽
     connect(ui->b1, &QPushButton::clicked, this, [this](){ playSound(1); });
     connect(ui->b2, &QPushButton::clicked, this, [this](){ playSound(2); });
     connect(ui->b3, &QPushButton::clicked, this, [this](){ playSound(3); });
@@ -43,9 +41,8 @@ Widget::Widget(QWidget *parent)
     connect(ui->b15, &QPushButton::clicked, this, [this](){ playSound(15); });
 }
 
-Widget::~Widget()
+MainWindow::~MainWindow()
 {
-    // 清理所有播放器和音频输出
     for(int i = 0; i < players.size(); i++) {
         players[i]->stop();
         delete players[i];
@@ -57,22 +54,15 @@ Widget::~Widget()
     delete ui;
 }
 
-void Widget::playSound(int number)
+void MainWindow::playSound(int number)
 {
-    // 使用资源路径而不是文件系统路径
     QString soundFile = QString(":/sounds/%1.mp3").arg(number);
-    
-    // 不需要检查文件是否存在，因为资源文件在编译时就已经确保存在
     qDebug() << "正在播放文件:" << soundFile;
-    
-    // 使用 QUrl 的 qrc 方案
     QUrl soundUrl = QUrl(QString("qrc%1").arg(soundFile));
     
-    // 查找空闲的播放器
     QMediaPlayer *availablePlayer = nullptr;
     QAudioOutput *availableOutput = nullptr;
     
-    // 遍历查找未在播放状态的播放器
     for(int i = 0; i < players.size(); i++) {
         if(players[i]->playbackState() != QMediaPlayer::PlayingState) {
             availablePlayer = players[i];
@@ -81,7 +71,6 @@ void Widget::playSound(int number)
         }
     }
     
-    // 如果没有找到空闲播放器，创建新的播放器
     if(!availablePlayer) {
         availablePlayer = new QMediaPlayer(this);
         availableOutput = new QAudioOutput(this);
@@ -91,7 +80,6 @@ void Widget::playSound(int number)
         players.append(availablePlayer);
         audioOutputs.append(availableOutput);
         
-        // 添加错误处理
         connect(availablePlayer, &QMediaPlayer::errorOccurred, 
                 this, [this](QMediaPlayer::Error error, const QString &errorString) {
             qDebug() << "播放器错误:" << error << errorString;
@@ -103,18 +91,15 @@ void Widget::playSound(int number)
     availablePlayer->play();
 }
 
-void Widget::keyPressEvent(QKeyEvent *event)
+void MainWindow::keyPressEvent(QKeyEvent *event)
 {
-    if(event->isAutoRepeat()) return;  // 防止按住键盘重复触发
-    
-    // 记录这个键被按下
+    if(event->isAutoRepeat()) return;
     pressedKeys.insert(event->key());
     
-    // 处理新按下的键
     switch(event->key()) {
         case Qt::Key_Q:
             playSound(1);
-            ui->b1->setDown(true);  // 显示按钮被按下的状态
+            ui->b1->setDown(true);
             break;
         case Qt::Key_W:
             playSound(2);
@@ -175,12 +160,10 @@ void Widget::keyPressEvent(QKeyEvent *event)
     }
 }
 
-void Widget::keyReleaseEvent(QKeyEvent *event)
+void MainWindow::keyReleaseEvent(QKeyEvent *event)
 {
-    // 从已按下的键集合中移除
     pressedKeys.remove(event->key());
     
-    // 处理释放的键
     switch(event->key()) {
         case Qt::Key_Q:
             ui->b1->setDown(false);

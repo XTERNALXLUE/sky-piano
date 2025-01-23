@@ -53,12 +53,12 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = ../../main.cpp \
-		../../widget.cpp qrc_res.cpp \
-		moc_widget.cpp
+		../../mainwindow.cpp qrc_res.cpp \
+		moc_mainwindow.cpp
 OBJECTS       = main.o \
-		widget.o \
+		mainwindow.o \
 		qrc_res.o \
-		moc_widget.o
+		moc_mainwindow.o
 DIST          = /usr/lib/qt6/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt6/mkspecs/common/unix.conf \
 		/usr/lib/qt6/mkspecs/common/linux.conf \
@@ -337,8 +337,8 @@ DIST          = /usr/lib/qt6/mkspecs/features/spec_pre.prf \
 		/usr/lib/qt6/mkspecs/features/exceptions.prf \
 		/usr/lib/qt6/mkspecs/features/yacc.prf \
 		/usr/lib/qt6/mkspecs/features/lex.prf \
-		../../../../sky-piano.pro ../../widget.h ../../main.cpp \
-		../../widget.cpp
+		../../../../sky-piano.pro ../../mainwindow.h ../../main.cpp \
+		../../mainwindow.cpp
 QMAKE_TARGET  = sky-piano
 DESTDIR       = 
 TARGET        = sky-piano
@@ -347,7 +347,7 @@ TARGET        = sky-piano
 first: all
 ####### Build rules
 
-sky-piano: ui_widget.h $(OBJECTS)  
+sky-piano: ui_mainwindow.h $(OBJECTS)  
 	$(LINK) $(LFLAGS) -o $(TARGET)  $(OBJECTS) $(OBJCOMP) $(LIBS)
 
 Makefile: ../../sky-piano.pro /usr/lib/qt6/mkspecs/linux-g++/qmake.conf /usr/lib/qt6/mkspecs/features/spec_pre.prf \
@@ -937,9 +937,9 @@ distdir: FORCE
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents ../../res.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/qt6/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../../widget.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../../main.cpp ../../widget.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../../widget.ui $(DISTDIR)/
+	$(COPY_FILE) --parents ../../mainwindow.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../../main.cpp ../../mainwindow.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../../mainwindow.ui $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -991,24 +991,24 @@ compiler_moc_predefs_clean:
 moc_predefs.h: /usr/lib/qt6/mkspecs/features/data/dummy.cpp
 	g++ -pipe -g -std=gnu++1z -Wall -Wextra -dM -E -o moc_predefs.h /usr/lib/qt6/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all: moc_widget.cpp
+compiler_moc_header_make_all: moc_mainwindow.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_widget.cpp
-moc_widget.cpp: ../../widget.h \
+	-$(DEL_FILE) moc_mainwindow.cpp
+moc_mainwindow.cpp: ../../mainwindow.h \
 		moc_predefs.h \
 		/usr/lib/qt6/moc
-	/usr/lib/qt6/moc $(DEFINES) --include /home/neo/Code/QT/sky-piano/build/Desktop-Debug/moc_predefs.h -I/usr/lib/qt6/mkspecs/linux-g++ -I/home/neo/Code/QT/sky-piano -I/usr/include/qt6 -I/usr/include/qt6/QtMultimedia -I/usr/include/qt6/QtWidgets -I/usr/include/qt6/QtGui -I/usr/include/qt6/QtNetwork -I/usr/include/qt6/QtCore -I. -I/usr/include/c++/14.2.1 -I/usr/include/c++/14.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/14.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/14.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/14.2.1/include-fixed -I/usr/include ../../widget.h -o moc_widget.cpp
+	/usr/lib/qt6/moc $(DEFINES) --include /home/neo/Code/QT/sky-piano/build/Desktop-Debug/moc_predefs.h -I/usr/lib/qt6/mkspecs/linux-g++ -I/home/neo/Code/QT/sky-piano -I/usr/include/qt6 -I/usr/include/qt6/QtMultimedia -I/usr/include/qt6/QtWidgets -I/usr/include/qt6/QtGui -I/usr/include/qt6/QtNetwork -I/usr/include/qt6/QtCore -I. -I/usr/include/c++/14.2.1 -I/usr/include/c++/14.2.1/x86_64-pc-linux-gnu -I/usr/include/c++/14.2.1/backward -I/usr/lib/gcc/x86_64-pc-linux-gnu/14.2.1/include -I/usr/local/include -I/usr/lib/gcc/x86_64-pc-linux-gnu/14.2.1/include-fixed -I/usr/include ../../mainwindow.h -o moc_mainwindow.cpp
 
 compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
-compiler_uic_make_all: ui_widget.h
+compiler_uic_make_all: ui_mainwindow.h
 compiler_uic_clean:
-	-$(DEL_FILE) ui_widget.h
-ui_widget.h: ../../widget.ui \
+	-$(DEL_FILE) ui_mainwindow.h
+ui_mainwindow.h: ../../mainwindow.ui \
 		/usr/lib/qt6/uic
-	/usr/lib/qt6/uic ../../widget.ui -o ui_widget.h
+	/usr/lib/qt6/uic ../../mainwindow.ui -o ui_mainwindow.h
 
 compiler_yacc_decl_make_all:
 compiler_yacc_decl_clean:
@@ -1020,18 +1020,18 @@ compiler_clean: compiler_rcc_clean compiler_moc_predefs_clean compiler_moc_heade
 
 ####### Compile
 
-main.o: ../../main.cpp ../../widget.h
+main.o: ../../main.cpp ../../mainwindow.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../../main.cpp
 
-widget.o: ../../widget.cpp ../../widget.h \
-		ui_widget.h
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o widget.o ../../widget.cpp
+mainwindow.o: ../../mainwindow.cpp ../../mainwindow.h \
+		ui_mainwindow.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o ../../mainwindow.cpp
 
 qrc_res.o: qrc_res.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o qrc_res.o qrc_res.cpp
 
-moc_widget.o: moc_widget.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_widget.o moc_widget.cpp
+moc_mainwindow.o: moc_mainwindow.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_mainwindow.o moc_mainwindow.cpp
 
 ####### Install
 
