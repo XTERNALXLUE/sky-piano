@@ -2,14 +2,11 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QMediaPlayer>
-#include <QAudioOutput>
-#include <QDebug>
-#include <QKeyEvent>
-#include <QCoreApplication>
-#include <QSet>
-#include <QPixmap>
-#include <QPaintEvent>
+#include <QMap>
+#include <QPushButton>
+#include "audiomanager.h"
+#include "backgroundmanager.h"
+#include "pianokey.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -30,16 +27,20 @@ protected:
     void keyReleaseEvent(QKeyEvent *event) override;
     void paintEvent(QPaintEvent *event) override;
 
-private:
-    Ui::MainWindow *ui;
-    QList<QMediaPlayer*> players;
-    QList<QAudioOutput*> audioOutputs;
-    QSet<int> pressedKeys;
-    QPixmap backgroundImage;
-    
 private slots:
-    void playSound(int number);
-    void setBackground();
-    void loadBackgroundImage();  // 添加加载背景图片的私有函数
+    void onKeyStateChanged(int keyNumber, bool pressed);
+    void onBackgroundChanged();
+    void selectBackground();
+
+private:
+    void setupPianoKeys();
+    void setupConnections();
+    QPushButton* getButtonForKey(int keyNumber);
+
+    Ui::MainWindow *ui;
+    AudioManager *m_audioManager;
+    BackgroundManager *m_backgroundManager;
+    QMap<int, PianoKey*> m_pianoKeys;
 };
+
 #endif // MAINWINDOW_H

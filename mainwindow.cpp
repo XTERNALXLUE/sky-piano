@@ -1,244 +1,132 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include <QMediaPlayer>
-#include <QtMultimedia/QMediaPlayer>
-#include <QDebug>
-#include <QFileInfo>
-#include <QAudioOutput>
-#include <QKeyEvent>
 #include <QFileDialog>
-#include <QStyle>
-#include <QPixmap>
-#include <QDir>
-#include <QStandardPaths>
 #include <QPainter>
-#include <QGridLayout>
+#include <QKeyEvent>
+#include <QTimer>
+#include <QIcon>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
+    , m_audioManager(new AudioManager(this))
+    , m_backgroundManager(new BackgroundManager(this))
 {
     ui->setupUi(this);
     this->setFixedSize(800, 450);
+    this->setWindowTitle("sky-piano");
+    this->setWindowIcon(QIcon(":/icons/icon.png"));
     
-    for(int i = 0; i < 15; i++) {
-        QMediaPlayer *player = new QMediaPlayer(this);
-        QAudioOutput *audioOutput = new QAudioOutput(this);
-        player->setAudioOutput(audioOutput);
-        audioOutput->setVolume(1.0);
-        
-        players.append(player);
-        audioOutputs.append(audioOutput);
-    }
-
-    connect(ui->b1, &QPushButton::clicked, this, [this](){ playSound(1); });
-    connect(ui->b2, &QPushButton::clicked, this, [this](){ playSound(2); });
-    connect(ui->b3, &QPushButton::clicked, this, [this](){ playSound(3); });
-    connect(ui->b4, &QPushButton::clicked, this, [this](){ playSound(4); });
-    connect(ui->b5, &QPushButton::clicked, this, [this](){ playSound(5); });
-    connect(ui->b6, &QPushButton::clicked, this, [this](){ playSound(6); });
-    connect(ui->b7, &QPushButton::clicked, this, [this](){ playSound(7); });
-    connect(ui->b8, &QPushButton::clicked, this, [this](){ playSound(8); });
-    connect(ui->b9, &QPushButton::clicked, this, [this](){ playSound(9); });
-    connect(ui->b10, &QPushButton::clicked, this, [this](){ playSound(10); });
-    connect(ui->b11, &QPushButton::clicked, this, [this](){ playSound(11); });
-    connect(ui->b12, &QPushButton::clicked, this, [this](){ playSound(12); });
-    connect(ui->b13, &QPushButton::clicked, this, [this](){ playSound(13); });
-    connect(ui->b14, &QPushButton::clicked, this, [this](){ playSound(14); });
-    connect(ui->b15, &QPushButton::clicked, this, [this](){ playSound(15); });
-
-    // 连接设置背景的动作
-    connect(ui->actionset_background, &QAction::triggered, this, &MainWindow::setBackground);
-    
-    // 创建资源目录并加载背景
-    QDir().mkpath("resource/img");
-    loadBackgroundImage();
+    setupPianoKeys();
+    setupConnections();
 }
 
 MainWindow::~MainWindow()
 {
-    for(int i = 0; i < players.size(); i++) {
-        players[i]->stop();
-        delete players[i];
-        delete audioOutputs[i];
-    }
-    players.clear();
-    audioOutputs.clear();
-    
     delete ui;
 }
 
-void MainWindow::playSound(int number)
+void MainWindow::setupPianoKeys()
 {
-    QString soundFile = QString(":/sounds/%1.mp3").arg(number);
-    QUrl soundUrl = QUrl(QString("qrc%1").arg(soundFile));
-    
-    QMediaPlayer *availablePlayer = nullptr;
-    QAudioOutput *availableOutput = nullptr;
-    
-    for(int i = 0; i < players.size(); i++) {
-        if(players[i]->playbackState() != QMediaPlayer::PlayingState) {
-            availablePlayer = players[i];
-            availableOutput = audioOutputs[i];
-            break;
-        }
-    }
-    
-    if(!availablePlayer) {
-        availablePlayer = new QMediaPlayer(this);
-        availableOutput = new QAudioOutput(this);
-        availablePlayer->setAudioOutput(availableOutput);
-        availableOutput->setVolume(1.0);
+    // 定义钢琴键的配置
+    struct KeyConfig {
+        int number;
+        Qt::Key key;
+        QPushButton* button;
+    };
+
+    KeyConfig configs[] = {
+        {1, Qt::Key_Q, ui->b1}, {2, Qt::Key_W, ui->b2},
+        {3, Qt::Key_E, ui->b3}, {4, Qt::Key_R, ui->b4},
+        {5, Qt::Key_T, ui->b5}, {6, Qt::Key_A, ui->b6},
+        {7, Qt::Key_S, ui->b7}, {8, Qt::Key_D, ui->b8},
+        {9, Qt::Key_F, ui->b9}, {10, Qt::Key_G, ui->b10},
+        {11, Qt::Key_Z, ui->b11}, {12, Qt::Key_X, ui->b12},
+        {13, Qt::Key_C, ui->b13}, {14, Qt::Key_V, ui->b14},
+        {15, Qt::Key_B, ui->b15}
+    };
+
+    for (const auto& config : configs) {
+        QString soundFile = QString(":/sounds/%1.mp3").arg(config.number);
+        auto key = new PianoKey(config.number, config.key, soundFile, this);
+        m_pianoKeys[config.number] = key;
         
-        players.append(availablePlayer);
-        audioOutputs.append(availableOutput);
-        
-        connect(availablePlayer, &QMediaPlayer::errorOccurred, 
-                this, [this](QMediaPlayer::Error error, const QString &errorString) {
-            qDebug() << "播放器错误:" << error << errorString;
+        connect(config.button, &QPushButton::clicked, key, [key]() {
+            key->setPressed(true);
+            // 使用QTimer来模拟按钮释放
+            QTimer::singleShot(100, key, [key]() {
+                key->setPressed(false);
+            });
         });
     }
-    
-    availablePlayer->setSource(soundUrl);
-    availablePlayer->play();
+}
+
+void MainWindow::setupConnections()
+{
+    // 连接钢琴键信号
+    for (auto key : m_pianoKeys) {
+        connect(key, &PianoKey::keyStateChanged,
+                this, &MainWindow::onKeyStateChanged);
+        connect(key, &PianoKey::playRequested,
+                m_audioManager, &AudioManager::playSound);
+    }
+
+    // 连接背景相关信号
+    connect(m_backgroundManager, &BackgroundManager::backgroundChanged,
+            this, &MainWindow::onBackgroundChanged);
+    connect(ui->actionset_background, &QAction::triggered,
+            this, &MainWindow::selectBackground);
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
-    if(event->isAutoRepeat()) return;
-    pressedKeys.insert(event->key());
+    if (event->isAutoRepeat()) return;
     
-    switch(event->key()) {
-        case Qt::Key_Q:
-            playSound(1);
-            ui->b1->setDown(true);
+    for (auto key : m_pianoKeys) {
+        if (key->keyboardKey() == static_cast<Qt::Key>(event->key())) {
+            key->setPressed(true);
             break;
-        case Qt::Key_W:
-            playSound(2);
-            ui->b2->setDown(true);
-            break;
-        case Qt::Key_E:
-            playSound(3);
-            ui->b3->setDown(true);
-            break;
-        case Qt::Key_R:
-            playSound(4);
-            ui->b4->setDown(true);
-            break;
-        case Qt::Key_T:
-            playSound(5);
-            ui->b5->setDown(true);
-            break;
-        case Qt::Key_A:
-            playSound(6);
-            ui->b6->setDown(true);
-            break;
-        case Qt::Key_S:
-            playSound(7);
-            ui->b7->setDown(true);
-            break;
-        case Qt::Key_D:
-            playSound(8);
-            ui->b8->setDown(true);
-            break;
-        case Qt::Key_F:
-            playSound(9);
-            ui->b9->setDown(true);
-            break;
-        case Qt::Key_G:
-            playSound(10);
-            ui->b10->setDown(true);
-            break;
-        case Qt::Key_Z:
-            playSound(11);
-            ui->b11->setDown(true);
-            break;
-        case Qt::Key_X:
-            playSound(12);
-            ui->b12->setDown(true);
-            break;
-        case Qt::Key_C:
-            playSound(13);
-            ui->b13->setDown(true);
-            break;
-        case Qt::Key_V:
-            playSound(14);
-            ui->b14->setDown(true);
-            break;
-        case Qt::Key_B:
-            playSound(15);
-            ui->b15->setDown(true);
-            break;
+        }
     }
 }
 
 void MainWindow::keyReleaseEvent(QKeyEvent *event)
 {
-    pressedKeys.remove(event->key());
-    
-    switch(event->key()) {
-        case Qt::Key_Q:
-            ui->b1->setDown(false);
+    if (event->isAutoRepeat()) return;
+
+    for (auto key : m_pianoKeys) {
+        if (key->keyboardKey() == static_cast<Qt::Key>(event->key())) {
+            key->setPressed(false);
             break;
-        case Qt::Key_W:
-            ui->b2->setDown(false);
-            break;
-        case Qt::Key_E:
-            ui->b3->setDown(false);
-            break;
-        case Qt::Key_R:
-            ui->b4->setDown(false);
-            break;
-        case Qt::Key_T:
-            ui->b5->setDown(false);
-            break;
-        case Qt::Key_A:
-            ui->b6->setDown(false);
-            break;
-        case Qt::Key_S:
-            ui->b7->setDown(false);
-            break;
-        case Qt::Key_D:
-            ui->b8->setDown(false);
-            break;
-        case Qt::Key_F:
-            ui->b9->setDown(false);
-            break;
-        case Qt::Key_G:
-            ui->b10->setDown(false);
-            break;
-        case Qt::Key_Z:
-            ui->b11->setDown(false);
-            break;
-        case Qt::Key_X:
-            ui->b12->setDown(false);
-            break;
-        case Qt::Key_C:
-            ui->b13->setDown(false);
-            break;
-        case Qt::Key_V:
-            ui->b14->setDown(false);
-            break;
-        case Qt::Key_B:
-            ui->b15->setDown(false);
-            break;
+        }
     }
 }
 
-void MainWindow::loadBackgroundImage()
+void MainWindow::paintEvent(QPaintEvent *event)
 {
-    QDir imgDir("resource/img");
-    QStringList filters;
-    filters << "background.*";
-    QStringList files = imgDir.entryList(filters, QDir::Files);
+    QPainter painter(this);
+    const QPixmap& background = m_backgroundManager->currentBackground();
     
-    if (!files.isEmpty()) {
-        QString backgroundPath = "resource/img/" + files.first();
-        backgroundImage.load(backgroundPath);
+    if (!background.isNull()) {
+        painter.drawPixmap(rect(), background);
+    }
+    
+    QMainWindow::paintEvent(event);
+}
+
+void MainWindow::onKeyStateChanged(int keyNumber, bool pressed)
+{
+    if (QPushButton* button = getButtonForKey(keyNumber)) {
+        button->setDown(pressed);
     }
 }
 
-void MainWindow::setBackground()
+void MainWindow::onBackgroundChanged()
+{
+    update();
+}
+
+void MainWindow::selectBackground()
 {
     QString fileName = QFileDialog::getOpenFileName(this,
         tr("Select background image"),
@@ -246,34 +134,28 @@ void MainWindow::setBackground()
         tr("图片文件 (*.png *.jpg *.jpeg *.bmp)"));
         
     if (!fileName.isEmpty()) {
-        QFileInfo fileInfo(fileName);
-        QString extension = fileInfo.suffix();
-        
-        // 删除旧的背景图片
-        QDir imgDir("resource/img");
-        QStringList filters;
-        filters << "background.*";
-        QStringList oldFiles = imgDir.entryList(filters, QDir::Files);
-        for (const QString &oldFile : oldFiles) {
-            imgDir.remove(oldFile);
-        }
-        
-        // 复制新图片到资源目录
-        QString newPath = QString("resource/img/background.%1").arg(extension);
-        if (QFile::copy(fileName, newPath)) {
-            backgroundImage.load(newPath);
-            update();  // 触发重绘
-        }
+        m_backgroundManager->setBackgroundFromFile(fileName);
     }
 }
 
-void MainWindow::paintEvent(QPaintEvent *event)
+QPushButton* MainWindow::getButtonForKey(int keyNumber)
 {
-    QMainWindow::paintEvent(event);
-    
-    if (!backgroundImage.isNull()) {
-        QPainter painter(this);
-        // 将图片缩放到窗口大小并绘制
-        painter.drawPixmap(0, 0, width(), height(), backgroundImage);
+    switch(keyNumber) {
+        case 1: return ui->b1;
+        case 2: return ui->b2;
+        case 3: return ui->b3;
+        case 4: return ui->b4;
+        case 5: return ui->b5;
+        case 6: return ui->b6;
+        case 7: return ui->b7;
+        case 8: return ui->b8;
+        case 9: return ui->b9;
+        case 10: return ui->b10;
+        case 11: return ui->b11;
+        case 12: return ui->b12;
+        case 13: return ui->b13;
+        case 14: return ui->b14;
+        case 15: return ui->b15;
+        default: return nullptr;
     }
 }

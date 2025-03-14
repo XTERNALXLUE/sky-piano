@@ -1,0 +1,10 @@
+debug/audiomanager.o
+debug/backgroundmanager.o
+debug/main.o
+debug/mainwindow.o
+debug/pianokey.o
+debug/qrc_res.o
+debug/moc_audiomanager.o
+debug/moc_backgroundmanager.o
+debug/moc_mainwindow.o
+debug/moc_pianokey.o

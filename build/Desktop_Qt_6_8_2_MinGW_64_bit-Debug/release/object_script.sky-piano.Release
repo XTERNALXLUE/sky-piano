@@ -1,0 +1,10 @@
+release/audiomanager.o
+release/backgroundmanager.o
+release/main.o
+release/mainwindow.o
+release/pianokey.o
+release/qrc_res.o
+release/moc_audiomanager.o
+release/moc_backgroundmanager.o
+release/moc_mainwindow.o
+release/moc_pianokey.o

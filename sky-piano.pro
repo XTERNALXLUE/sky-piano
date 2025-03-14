@@ -9,11 +9,17 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    audiomanager.cpp \
+    backgroundmanager.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    pianokey.cpp
 
 HEADERS += \
-    mainwindow.h
+    audiomanager.h \
+    backgroundmanager.h \
+    mainwindow.h \
+    pianokey.h
 
 FORMS += \
     mainwindow.ui
@@ -24,5 +30,4 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 RESOURCES += \
-    res.qrc \
-    sounds.qrc
+    res.qrc
